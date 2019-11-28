@@ -3,7 +3,8 @@ type Pair ={
     // tokens: [string, string],
     name: string
     volume: number
-    rate?: number
+    buyRate?: number
+    sellRate?: number
     rateDate?: string
 }
 

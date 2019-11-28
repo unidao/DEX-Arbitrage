@@ -16,26 +16,50 @@ export default class OasisParser extends AbstractParser {
     dexName = 'Oasis';
     contractAddr = OasisAddr;
 
-    async getRates(): Promise<RatesResult[]> {
+    async getRates(): Promise<Pair[]> {
 
-        let res: RatesResult[] = [];
+        let res: Pair[] = [];
         for (let pair of this.pares) {
-            res.push(await this.getRate(pair))
+            res.push(await this.getRateForPair(pair))
         }
 
 
         return res;
     }
 
-    private async getRate(pair: Pair): Promise<RatesResult> {
+    private async getRateForPair(pair: Pair): Promise<Pair> {
 
 
         // @ts-ignore
         const oasisContract = new web3.eth.Contract(ABI, this.contractAddr);
 
+
+        let res1: RatesResult = await this.getRate(oasisContract, pair);
+        let res2: RatesResult = await this.getRate(oasisContract, pair, true);
+
+        if(res1){
+            pair.buyRate = res1.rate;
+        }
+
+        if(res2){
+            pair.sellRate= res2.rate;
+        }
+
+
+
+        return pair;
+    }
+
+
+    private async getRate(oasisContract: any, pair: Pair, reverse: boolean = false): Promise<RatesResult>{
+
         // params
-        const firstToken = pair.tokens[0];
-        const secondToken = pair.tokens[1];
+        let firstToken = pair.tokens[0];
+        let secondToken = pair.tokens[1];
+        if(reverse){
+            firstToken = pair.tokens[1];
+            secondToken = pair.tokens[0];
+        }
         const requiredVolume = pair.volume;
 
         let currentVolume = 0;
@@ -52,11 +76,12 @@ export default class OasisParser extends AbstractParser {
                     console.log('get worse order')
                     lastOrderId = await oasisContract.methods.getWorseOffer(lastOrderMemory).call();
                     if (lastOrderId == 0) {
-                        console.log(`недостаточно офферов для объема, DEX: ${this.dexName}. PAIR: ${pair.name}`)
+                        let msg = `недостаточно офферов для объема, DEX: ${this.dexName}. PAIR: ${pair.name}`;
+                        console.log(msg)
 
                         return {
                             success: false,
-                            pair: pair
+                            message: msg
                         }
                     }
                 }
@@ -83,23 +108,22 @@ export default class OasisParser extends AbstractParser {
             */
 
         } catch (e) {
-            console.log(`Error while downloading offers for DEX: ${this.dexName}. PAIR: ${pair.name}`)
+            let msg = `Error while downloading offers for DEX: ${this.dexName}. PAIR: ${pair.name}`;
+            console.log(msg)
             console.log(e.getMessage());
             return {
                 success: false,
-                pair: pair
+                message: msg
             }
         }
 
-        let pairWithResult = pair;
-
-        pairWithResult.rate = secondVolume / currentVolume;
 
         return {
             success: true,
-            pair: pairWithResult
+            rate: secondVolume / currentVolume
         }
     }
+
 }
 
 

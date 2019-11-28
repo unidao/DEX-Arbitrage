@@ -9,7 +9,7 @@ export default abstract class AbstractParser {
     public constructor(pares: Pair[]) {
         this.pares = pares;
     }
-    abstract getRates() : Promise<RatesResult[]>;
+    abstract getRates() : Promise<Pair[]>;
     // abstract validatePair(): void
 
 }

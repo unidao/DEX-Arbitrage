@@ -9,10 +9,11 @@ const main = async function (): Promise<number> {
     const connector = new Connector(pairs);
     const result = await connector.getAllRates();
 
+    console.log(result);
     if(result.Oasis){
         for(let pairResult of result.Oasis){
             if(pairResult.success){
-                console.log(pairResult.pair)
+                console.log(pairResult)
             }
         }
     }

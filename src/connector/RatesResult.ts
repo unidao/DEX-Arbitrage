@@ -1,7 +1,8 @@
 import Pair from "./Pair";
 
 export default  interface RatesResult {
-    pair: Pair
+    // pair: Pair
     success: boolean
     message?: string
+    rate?: number
 }
