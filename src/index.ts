@@ -1,5 +1,3 @@
-
-import AbiItem from "web3-utils";
 import Connector from './connector/Connector';
 import Analyzer from './analyzer/Analyzer';
 import Logger from './logger/Logger'
@@ -20,7 +18,7 @@ const main = async function (): Promise<number> {
     }
 
     // const analyzer = new Analyzer();
-    // const abilities = analyzer.analyzePaires(pares);
+    // const abilities = analyzer.analyzePairs(pairs);
 
     // const logger = new Logger();
     // logger.log(abilities);
