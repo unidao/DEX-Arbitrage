@@ -120,7 +120,7 @@ export default class OasisParser extends AbstractParser {
 
         return {
             success: true,
-            rate: secondVolume / currentVolume
+            rate: reverse ? currentVolume / secondVolume : secondVolume / currentVolume
         }
     }
 
