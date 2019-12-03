@@ -10,7 +10,8 @@
   ],
   "period": 120,
   "contractsAddrs": {
-    "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e"
+    "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e",
+    "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95"
   },
   "ethereumProvider": "https://mainnet.infura.io/v3/017f815a252547ffbe03eefa154f5519"
 }

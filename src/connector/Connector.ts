@@ -1,5 +1,6 @@
 import AbstractParser from "./AbstractParser";
 import OasisParser from "./parsers/OasisParser";
+import UniswapParser from "./parsers/UniswapParser";
 import Pair from "./Pair";
 
 
@@ -10,7 +11,9 @@ export default class Connector {
     constructor(private pairs: Pair[]) {
         const cleanPairs = this.getPairs();
         const oasisParser = new OasisParser(cleanPairs);
-        this.parsers = [oasisParser]
+        const uniswapParser = new UniswapParser(cleanPairs);
+        this.parsers = [uniswapParser]
+        // this.parsers = [oasisParser, uniswapParser]
     }
 
 

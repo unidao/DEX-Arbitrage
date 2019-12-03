@@ -19,7 +19,7 @@ export default class OasisParser extends AbstractParser {
     async getRates(): Promise<Pair[]> {
 
         let res: Pair[] = [];
-        for (let pair of this.pares) {
+        for (let pair of this.pairs) {
             res.push(await this.getRateForPair(pair))
         }
 
