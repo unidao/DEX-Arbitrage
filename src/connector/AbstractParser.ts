@@ -11,7 +11,7 @@ export default abstract class AbstractParser {
         this.pairs = pairs;
     }
 
-    public tokenNames(pair: Pair) {
+    public getTokenNames(pair: Pair) {
         return pair.name.split('-')
     }
 

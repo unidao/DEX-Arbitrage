@@ -39,7 +39,7 @@ export default class UniswapParser extends AbstractParser {
 
 
         const [firstToken, secondToken] = pair.tokens;
-        const [firstTokenName, secondTokenName] = this.tokenNames(pair);
+        const [firstTokenName, secondTokenName] = this.getTokenNames(pair);
         const hasEthereum = firstToken === ETHEREUM || secondToken === ETHEREUM;
 
         let firstTokenExchange: string;
@@ -50,9 +50,9 @@ export default class UniswapParser extends AbstractParser {
 
         try {
             const secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
-            // const firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
+            const firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
 
-            // console.log("firstTokenRate ", firstTokenVolume)
+            console.log("firstTokenRate ", firstTokenVolume)
             console.log("secondTokenVolume ", secondTokenVolume)
         }catch (e) {
             console.log(e.message);
