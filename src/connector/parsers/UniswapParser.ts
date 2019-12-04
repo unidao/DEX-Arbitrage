@@ -6,11 +6,13 @@ import EXCHANGE_ABI from "./../../ABI/uniswapExchangeAbi.json";
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
 import Converter from "./../Converter"
+
 const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
 
 const ETHEREUM = 'eth';
+const UI256 = 100000000;
 
 
 export default class UniswapParser extends AbstractParser {
@@ -37,74 +39,86 @@ export default class UniswapParser extends AbstractParser {
 
     private async getRateForPair(pair: Pair): Promise<Pair> {
 
+        const pairClone = {...pair}
 
+        // Init
         const [firstToken, secondToken] = pair.tokens;
         const [firstTokenName, secondTokenName] = this.getTokenNames(pair);
         const hasEthereum = firstToken === ETHEREUM || secondToken === ETHEREUM;
 
         let firstTokenExchange: string;
         let secondTokenExchange: string;
+        let firstTokenVolume: number;
+        let secondTokenVolume: number;
 
 
-
-
+        // Get volumes from dollars
         try {
-            const secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
-            const firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
+            // secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
+            firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
+        } catch (e) {
 
-            console.log("firstTokenRate ", firstTokenVolume)
-            console.log("secondTokenVolume ", secondTokenVolume)
-        }catch (e) {
             console.log(e.message);
+            return  pair;
         }
 
 
+        // Get exchanges
         try {
             [firstTokenExchange, secondTokenExchange] = await this.getExchangesAddresses(firstToken, secondToken);
         } catch (e) {
             console.log(`Cant get uniswap exchange addresses for ${pair.name}`)
             console.log(e.message);
-            return pair;
-        }
-
-        if(hasEthereum){
-
-        }else{
-            this.getTknToTknRates(firstTokenExchange, secondTokenExchange, pair.volume);
+            return  pair;
         }
 
 
+        // if (hasEthereum) {
+        //
+        // } else {
+        //
+        // }
+        const result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume);
+
+        pairClone.sellRate = result.sellRate;
+        pairClone.buyRate = result.buyRate;
 
 
-        console.log("firstTokenExchange ", firstTokenExchange)
-        console.log("secondTokenExchange ", secondTokenExchange)
-
-
-        return pair;
+        return pairClone;
     }
 
 
-    private async getTknToTknRates(firstTokenExchange: string, secondTokenExchange: string,
-                                   volume: number){
+    private async getTknToTknRates(firstTokenExchange: string,
+                                   secondTokenExchange: string,
+                                   firstTokenVolume: number
+    ): Promise<{sellRate: number, buyRate: number}> {
 
 
-        return;
         // @ts-ignore
         const firstTokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, firstTokenExchange);
         // @ts-ignore
         const secondTokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, secondTokenExchange);
 
 
-        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(volume).call();
-        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(volume).call();
 
-        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(volume).call();
-        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(volume).call();
+        const ftvwei = parseInt((firstTokenVolume*UI256).toString());
+        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(ftvwei).call();
+        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(ftvwei).call();
 
-        console.log("outputPriceTkn1 ", outputPriceTkn1)
-        console.log("inputPriceTkn1 ", inputPriceTkn1)
-        console.log("outputPriceTkn2 ", outputPriceTkn2)
-        console.log("inputPriceTkn2 ", inputPriceTkn2)
+
+        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(outputPriceTkn1).call();
+        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(inputPriceTkn1).call();
+
+
+        const buyPrice = outputPriceTkn2 / firstTokenVolume / UI256;
+        const sellPrice = inputPriceTkn2 / firstTokenVolume / UI256;
+
+
+
+
+        return {
+            sellRate: sellPrice, buyRate: buyPrice
+        }
     }
 
     private async getExchangesAddresses(firstToken: string, secondToken: string): Promise<string[]> {

@@ -60,6 +60,7 @@ export default class OasisParser extends AbstractParser {
             firstToken = pair.tokens[1];
             secondToken = pair.tokens[0];
         }
+        // const requiredVolume = await this.getVolumeForToken(this.getTokenNames(pair)[0], pair.volume);
         const requiredVolume = pair.volume;
 
         let currentVolume = 0;

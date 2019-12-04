@@ -20,15 +20,15 @@ export default class Converter {
     }
 
     public async getRate(tokenSymbol: string): Promise<number | undefined> {
-        const isValid = await this.validateToken(tokenSymbol);
-        if (!isValid) {
+        const tokenId = await this.getTokenId(tokenSymbol);
+        if (!tokenId) {
             throw `${tokenSymbol} token is not valid on coingecko`;
         }
 
         try {
-            const url = `${this.rateUrl}?vs_currencies=usd&ids=${tokenSymbol}`
+            const url = `${this.rateUrl}?vs_currencies=usd&ids=${tokenId}`
             const {data} = await axios.get(url);
-            const tokenData = data[tokenSymbol.toLowerCase()];
+            const tokenData = data[tokenId.toLowerCase()];
             if (!tokenData) {
                 console.log(`Cant define volume for ${tokenSymbol} token`);
                 return undefined;
@@ -43,15 +43,15 @@ export default class Converter {
         }
     }
 
-    private async validateToken(tokenSymbol: string) {
+    private async getTokenId(tokenSymbol: string): Promise<string | undefined> {
         try {
             const fullList = await axios.get(this.listUrl)
-            return fullList.data.some((item: any) => item.symbol === tokenSymbol.toLowerCase())
+            const item = fullList.data.find((item: any) => item.symbol === tokenSymbol.toLowerCase());
+            return (item && item.id) ? item.id : undefined;
         } catch (e) {
             console.log(`cant validate ${tokenSymbol} token`)
             console.log(e.message);
         }
-
     }
 
 }
