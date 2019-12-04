@@ -5,7 +5,7 @@ import ABI from "./../../ABI/uniswapAbi.json";
 import EXCHANGE_ABI from "./../../ABI/uniswapExchangeAbi.json";
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
-
+import Converter from "./../Converter"
 const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
@@ -38,12 +38,26 @@ export default class UniswapParser extends AbstractParser {
     private async getRateForPair(pair: Pair): Promise<Pair> {
 
 
-        const firstToken = pair.tokens[0];
-        const secondToken = pair.tokens[1];
+        const [firstToken, secondToken] = pair.tokens;
+        const [firstTokenName, secondTokenName] = this.tokenNames(pair);
         const hasEthereum = firstToken === ETHEREUM || secondToken === ETHEREUM;
 
         let firstTokenExchange: string;
         let secondTokenExchange: string;
+
+
+
+
+        try {
+            const secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
+            // const firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
+
+            // console.log("firstTokenRate ", firstTokenVolume)
+            console.log("secondTokenVolume ", secondTokenVolume)
+        }catch (e) {
+            console.log(e.message);
+        }
+
 
         try {
             [firstTokenExchange, secondTokenExchange] = await this.getExchangesAddresses(firstToken, secondToken);
@@ -72,6 +86,9 @@ export default class UniswapParser extends AbstractParser {
 
     private async getTknToTknRates(firstTokenExchange: string, secondTokenExchange: string,
                                    volume: number){
+
+
+        return;
         // @ts-ignore
         const firstTokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, firstTokenExchange);
         // @ts-ignore

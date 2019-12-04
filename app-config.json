@@ -5,7 +5,7 @@
       "tokens": [
         "0x1985365e9f78359a9b6ad760e32412f4a445e862", "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 1200
+      "volume": 100
     }
   ],
   "period": 120,
@@ -13,5 +13,9 @@
     "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e",
     "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95"
   },
-  "ethereumProvider": "https://mainnet.infura.io/v3/017f815a252547ffbe03eefa154f5519"
+  "ethereumProvider": "https://mainnet.infura.io/v3/017f815a252547ffbe03eefa154f5519",
+  "coinGecko":{
+    "listUrl": "https://api.coingecko.com/api/v3/coins/list",
+    "rateUrl": "https://api.coingecko.com/api/v3/simple/price"
+  }
 }
