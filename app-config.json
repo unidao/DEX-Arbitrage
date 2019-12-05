@@ -1,6 +1,20 @@
 {
   "pairs": [
     {
+      "name": "ethereum-dai",
+      "tokens": [
+        "ethereum", "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "volume": 100
+    },
+    {
+      "name": "dai-ethereum",
+      "tokens": [
+        "0x6b175474e89094c44da98b954eedeac495271d0f", "ethereum"
+      ],
+      "volume": 100
+    },
+    {
       "name": "0x-dai",
       "tokens": [
         "0xe41d2489571d322189246dafa5ebde1f4699f498", "0x6b175474e89094c44da98b954eedeac495271d0f"

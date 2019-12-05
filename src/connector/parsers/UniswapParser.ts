@@ -11,7 +11,7 @@ const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
 
-const ETHEREUM = 'eth';
+const ETHEREUM = 'ethereum';
 const UI256 = 100000000;
 
 
@@ -21,7 +21,6 @@ export default class UniswapParser extends AbstractParser {
     dexContract: any;
 
     async getRates(): Promise<Pair[]> {
-        console.log("=================")
         let res: Pair[] = [];
         for (let pair of this.pairs) {
             res.push(await this.getRateForPair(pair))
@@ -75,13 +74,17 @@ export default class UniswapParser extends AbstractParser {
             return  pair;
         }
 
+        let result;
+        if (hasEthereum) {
+            if(firstToken === ETHEREUM){
+                result = await this.getEthToTokenRates(secondTokenExchange, firstTokenVolume);
+            }else{
+                result = await this.getTknToEthRates(firstTokenExchange, firstTokenVolume);
+            }
+        } else {
+            result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume);
 
-        // if (hasEthereum) {
-        //
-        // } else {
-        //
-        // }
-        const result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume);
+        }
 
         pairClone.sellRate = result.sellRate;
         pairClone.buyRate = result.buyRate;
@@ -142,6 +145,70 @@ export default class UniswapParser extends AbstractParser {
             sellRate: sellPrice, buyRate: buyPrice
         }
     }
+
+
+
+
+
+    private async getEthToTokenRates(tokenExchange: string,
+                                   ethVolume: number,
+    ): Promise<{sellRate: number, buyRate: number}> {
+
+
+
+        // @ts-ignore
+        const tokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, tokenExchange);
+
+
+
+        const tvwei = parseInt((ethVolume*UI256).toString());
+
+        // купить токен можно по этой стоимость (эфир за токен)
+        const outputPriceTkn = await tokenExchangeContract.methods.getTokenToEthOutputPrice(tvwei).call();
+
+        // продать токен за эфир можно по этой стоимость (эфир за токен)
+        const inputPriceTkn = await tokenExchangeContract.methods.getEthToTokenInputPrice(tvwei).call();
+
+        const buyPrice = outputPriceTkn / tvwei;
+        const sellPrice = inputPriceTkn / tvwei;
+
+        return {
+            sellRate: sellPrice, buyRate: buyPrice
+        }
+    }
+
+
+
+
+    private async getTknToEthRates(tokenExchange: string,
+                                   tokenVolume: number,
+    ): Promise<{sellRate: number, buyRate: number}> {
+
+
+        // @ts-ignore
+        const tokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, tokenExchange);
+
+
+
+        const tvwei = parseInt((tokenVolume*UI256).toString());
+
+        // купить токен можно по этой стоимость (эфир за токен)
+        const outputPriceTkn = await tokenExchangeContract.methods.getEthToTokenOutputPrice(tvwei).call();
+
+        // продать токен за эфир можно по этой стоимость (эфир за токен)
+        const inputPriceTkn = await tokenExchangeContract.methods.getTokenToEthInputPrice(tvwei).call();
+
+        const buyPrice = outputPriceTkn / tvwei;
+        const sellPrice = inputPriceTkn / tvwei;
+
+        return {
+            sellRate: sellPrice, buyRate: buyPrice
+        }
+    }
+
+
+
+
 
     private async getExchangesAddresses(firstToken: string, secondToken: string): Promise<string[]> {
         const firstTokenExchange = firstToken === ETHEREUM ? ETHEREUM : await this.dexContract.methods.getExchange(firstToken).call();

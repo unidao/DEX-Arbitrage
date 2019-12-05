@@ -1,0 +1,35 @@
+{
+  "pairs": [
+    {
+      "name": "ethereum-dai",
+      "tokens": [
+        "", "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "volume": 100
+    },
+    {
+      "name": "0x-dai",
+      "tokens": [
+        "0xe41d2489571d322189246dafa5ebde1f4699f498", "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "volume": 100
+    },
+    {
+      "name": "maker-dai",
+      "tokens": [
+        "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2", "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "volume": 100
+    }
+  ],
+  "period": 120,
+  "contractsAddrs": {
+    "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e",
+    "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95"
+  },
+  "ethereumProvider": "https://mainnet.infura.io/v3/017f815a252547ffbe03eefa154f5519",
+  "coinGecko":{
+    "listUrl": "https://api.coingecko.com/api/v3/coins/list",
+    "rateUrl": "https://api.coingecko.com/api/v3/simple/price"
+  }
+}
