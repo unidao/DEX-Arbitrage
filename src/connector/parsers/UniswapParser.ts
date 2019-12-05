@@ -21,6 +21,7 @@ export default class UniswapParser extends AbstractParser {
     dexContract: any;
 
     async getRates(): Promise<Pair[]> {
+        console.log("=================")
         let res: Pair[] = [];
         for (let pair of this.pairs) {
             res.push(await this.getRateForPair(pair))
@@ -54,7 +55,7 @@ export default class UniswapParser extends AbstractParser {
 
         // Get volumes from dollars
         try {
-            // secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
+            secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
             firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
         } catch (e) {
 
@@ -66,6 +67,8 @@ export default class UniswapParser extends AbstractParser {
         // Get exchanges
         try {
             [firstTokenExchange, secondTokenExchange] = await this.getExchangesAddresses(firstToken, secondToken);
+            // console.log("firstTokenExchange ", firstTokenExchange)
+            // console.log("secondTokenExchange ", secondTokenExchange)
         } catch (e) {
             console.log(`Cant get uniswap exchange addresses for ${pair.name}`)
             console.log(e.message);
@@ -78,7 +81,7 @@ export default class UniswapParser extends AbstractParser {
         // } else {
         //
         // }
-        const result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume);
+        const result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume);
 
         pairClone.sellRate = result.sellRate;
         pairClone.buyRate = result.buyRate;
@@ -90,7 +93,8 @@ export default class UniswapParser extends AbstractParser {
 
     private async getTknToTknRates(firstTokenExchange: string,
                                    secondTokenExchange: string,
-                                   firstTokenVolume: number
+                                   firstTokenVolume: number,
+                                   secondTokenVolume: number
     ): Promise<{sellRate: number, buyRate: number}> {
 
 
@@ -102,17 +106,35 @@ export default class UniswapParser extends AbstractParser {
 
 
         const ftvwei = parseInt((firstTokenVolume*UI256).toString());
+        const stvwei = parseInt((secondTokenVolume*UI256).toString());
+
+        // купить токен можно по этой стоимость (эфир за токен)
         const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(ftvwei).call();
+
+        // продать токен за эфир можно по этой стоимость (эфир за токен)
         const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(ftvwei).call();
 
 
-        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(outputPriceTkn1).call();
-        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(inputPriceTkn1).call();
+        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(stvwei).call();
+        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(stvwei).call();
 
+        // console.log("volumes")
+        // console.log("firstTokenVolume: ", firstTokenVolume)
+        // console.log("secondTokenVolume: ", secondTokenVolume)
+        //
+        // console.log('-------------')
+        // console.log("outputPriceTkn1: ", outputPriceTkn1)
+        // console.log("outputPriceTkn2: ", outputPriceTkn2)
+        // console.log("inputPriceTkn1: ", inputPriceTkn1)
+        // console.log("inputPriceTkn2: ", inputPriceTkn2)
 
-        const buyPrice = outputPriceTkn2 / firstTokenVolume / UI256;
-        const sellPrice = inputPriceTkn2 / firstTokenVolume / UI256;
+        const buyPriceInEthToken1 = outputPriceTkn1 / ftvwei;
+        const buyPriceInEthToken2 = outputPriceTkn2 / stvwei;
+        const buyPrice = buyPriceInEthToken1 / buyPriceInEthToken2;
 
+        const sellPriceInEthToken1 = inputPriceTkn1 / ftvwei;
+        const sellPriceInEthToken2 = inputPriceTkn2 / stvwei;
+        const sellPrice = sellPriceInEthToken1 / sellPriceInEthToken2;
 
 
 

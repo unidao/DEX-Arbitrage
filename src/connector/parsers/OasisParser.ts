@@ -20,7 +20,14 @@ export default class OasisParser extends AbstractParser {
 
         let res: Pair[] = [];
         for (let pair of this.pairs) {
-            res.push(await this.getRateForPair(pair))
+            try{
+                const rate = await this.getRateForPair(pair);
+                res.push(rate)
+            }catch (e) {
+                console.log(`Error parsing ${pair} on ${this.dexName}`)
+                console.log(e.message)
+            }
+
         }
 
 
@@ -30,21 +37,27 @@ export default class OasisParser extends AbstractParser {
     private async getRateForPair(pair: Pair): Promise<Pair> {
 
 
-        // @ts-ignore
-        const oasisContract = new web3.eth.Contract(ABI, this.contractAddr);
+        try {
+            // @ts-ignore
+            const oasisContract = new web3.eth.Contract(ABI, this.contractAddr);
 
 
-        let res1: RatesResult = await this.getRate(oasisContract, pair);
-        let res2: RatesResult = await this.getRate(oasisContract, pair, true);
+            let res1: RatesResult = await this.getRate(oasisContract, pair);
+            console.log(res1)
+            let res2: RatesResult = await this.getRate(oasisContract, pair, true);
+            console.log(res1)
 
-        if(res1){
-            pair.buyRate = res1.rate;
+            if (res1) {
+                pair.buyRate = res1.rate;
+            }
+
+            if (res2) {
+                pair.sellRate = res2.rate;
+            }
+        }catch (e) {
+            console.log(`Error parsing ${pair} on ${this.dexName}`)
+            console.log(e.message)
         }
-
-        if(res2){
-            pair.sellRate= res2.rate;
-        }
-
 
 
         return pair;
@@ -70,12 +83,23 @@ export default class OasisParser extends AbstractParser {
         let lastOrderId: number = 0;
         try {
             while (requiredVolume >= currentVolume) {
+                console.log("currentVolume: ", currentVolume)
                 const lastOrderMemory: number = lastOrderId
                 if (currentVolume === 0) {
                     lastOrderId = await oasisContract.methods.getBestOffer(firstToken, secondToken).call();
+                    if(lastOrderId==0){
+                        let msg = `нет офферов для DEX: ${this.dexName}. PAIR: ${pair.name}`;
+                        console.log(msg)
+
+                        return {
+                            success: false,
+                            message: msg
+                        }
+                    }
                 } else {
                     console.log('get worse order')
                     lastOrderId = await oasisContract.methods.getWorseOffer(lastOrderMemory).call();
+
                     if (lastOrderId == 0) {
                         let msg = `недостаточно офферов для объема, DEX: ${this.dexName}. PAIR: ${pair.name}`;
                         console.log(msg)
@@ -89,7 +113,6 @@ export default class OasisParser extends AbstractParser {
 
 
                 const order: any = await oasisContract.methods.getOffer(lastOrderId).call();
-                orders.push(order);
                 const amount = Web3.utils.fromWei(order['0']);
                 currentVolume += parseFloat(amount);
                 secondVolume +=  parseFloat(Web3.utils.fromWei(order['2']));

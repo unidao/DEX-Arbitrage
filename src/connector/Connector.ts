@@ -14,6 +14,7 @@ export default class Connector {
         const uniswapParser = new UniswapParser(cleanPairs);
         // this.parsers = [uniswapParser]
         this.parsers = [oasisParser, uniswapParser]
+        // this.parsers = [oasisParser]
     }
 
 
@@ -24,11 +25,11 @@ export default class Connector {
     }
 
     public async getAllRates() {
-        let result: any = {
+        let result: any = {};
 
-        };
         const parsers = this.parsers;
-        for(let parser of parsers){
+        for (let parser of parsers) {
+            console.log(parser.dexName)
             result[parser.dexName] = await parser.getRates();
         }
 
