@@ -5,28 +5,28 @@
       "tokens": [
         "ethereum", "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 100
+      "volume": 1000
     },
     {
       "name": "dai-ethereum",
       "tokens": [
         "0x6b175474e89094c44da98b954eedeac495271d0f", "ethereum"
       ],
-      "volume": 100
+      "volume": 1000
     },
     {
       "name": "0x-dai",
       "tokens": [
         "0xe41d2489571d322189246dafa5ebde1f4699f498", "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 100
+      "volume": 1000
     },
     {
       "name": "maker-dai",
       "tokens": [
         "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2", "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 100
+      "volume": 1000
     }
   ],
   "period": 120,
