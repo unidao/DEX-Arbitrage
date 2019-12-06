@@ -1,6 +1,7 @@
 type Optional = number | undefined;
 
 import { ETHEREUM } from './Connector';
+const PAIR_SEPARATOR = '/';
 
 class Pair{
 
@@ -73,7 +74,7 @@ class Pair{
 
 
     public getTokenNames() {
-        return this.name.split('-');
+        return this.name.split(PAIR_SEPARATOR);
     }
 
 }
