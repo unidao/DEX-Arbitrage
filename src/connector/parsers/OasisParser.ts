@@ -6,10 +6,11 @@ import {ABI} from "./../../ABI/oasisAbi.json";
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
 
+
 const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
-
+const WETH_ADDR = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
 
 const OasisAddr = config.contractsAddrs.oasis;
 export default class OasisParser extends AbstractParser {
@@ -66,20 +67,26 @@ export default class OasisParser extends AbstractParser {
 
     private async getRate(oasisContract: any, pair: Pair, reverse: boolean = false): Promise<RatesResult>{
 
+        const pairClone: Pair = pair.getCopy();
+        pairClone.ethereumReplacement = WETH_ADDR;
+
         // params
-        let firstToken = pair.tokens[0];
-        let secondToken = pair.tokens[1];
+        let firstToken = pairClone.firstToken;
+        let secondToken = pairClone.secondToken;
         if(reverse){
-            firstToken = pair.tokens[1];
-            secondToken = pair.tokens[0];
+            firstToken = pairClone.secondToken;
+            secondToken = pairClone.firstToken;
         }
-        const requiredVolume = await this.getVolumeForToken(this.getTokenNames(pair)[0], pair.volume);
+        const requiredVolume = await this.getVolumeForToken(pairClone.getTokenNames()[0], pairClone.volume);
+
+        // console.log('------')
+        // console.log(firstToken)
+        // console.log(secondToken)
         // const requiredVolume = pair.volume;
 
         let currentVolume = 0;
         let secondVolume = 0;
 
-        let orders: any[] = [];
         let lastOrderId: number = 0;
         try {
             while (requiredVolume >= currentVolume) {
@@ -88,7 +95,7 @@ export default class OasisParser extends AbstractParser {
                 if (currentVolume === 0) {
                     lastOrderId = await oasisContract.methods.getBestOffer(firstToken, secondToken).call();
                     if(lastOrderId==0){
-                        let msg = `нет офферов для DEX: ${this.dexName}. PAIR: ${pair.name}`;
+                        let msg = `нет офферов для DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
                         console.log(msg)
 
                         return {
@@ -101,7 +108,7 @@ export default class OasisParser extends AbstractParser {
                     lastOrderId = await oasisContract.methods.getWorseOffer(lastOrderMemory).call();
 
                     if (lastOrderId == 0) {
-                        let msg = `недостаточно офферов для объема, DEX: ${this.dexName}. PAIR: ${pair.name}`;
+                        let msg = `недостаточно офферов для объема, DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
                         console.log(msg)
 
                         return {
@@ -132,9 +139,9 @@ export default class OasisParser extends AbstractParser {
             */
 
         } catch (e) {
-            let msg = `Error while downloading offers for DEX: ${this.dexName}. PAIR: ${pair.name}`;
+            let msg = `Error while downloading offers for DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
             console.log(msg)
-            console.log(e.getMessage());
+            console.log(e.message);
             return {
                 success: false,
                 message: msg

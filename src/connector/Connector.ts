@@ -3,6 +3,7 @@ import OasisParser from "./parsers/OasisParser";
 import UniswapParser from "./parsers/UniswapParser";
 import Pair from "./Pair";
 
+export const ETHEREUM = 'ethereum';
 
 export default class Connector {
 

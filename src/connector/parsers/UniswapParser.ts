@@ -10,8 +10,7 @@ import Converter from "./../Converter"
 const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
-
-const ETHEREUM = 'ethereum';
+import { ETHEREUM } from '../Connector';
 const UI256 = 100000000;
 
 
@@ -39,11 +38,11 @@ export default class UniswapParser extends AbstractParser {
 
     private async getRateForPair(pair: Pair): Promise<Pair> {
 
-        const pairClone = {...pair}
+        const pairClone: Pair = pair.getCopy();
 
         // Init
         const [firstToken, secondToken] = pair.tokens;
-        const [firstTokenName, secondTokenName] = this.getTokenNames(pair);
+        const [firstTokenName, secondTokenName] = pair.getTokenNames();
         const hasEthereum = firstToken === ETHEREUM || secondToken === ETHEREUM;
 
         let firstTokenExchange: string;

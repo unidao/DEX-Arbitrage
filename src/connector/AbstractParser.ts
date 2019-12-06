@@ -11,9 +11,7 @@ export default abstract class AbstractParser {
         this.pairs = pairs;
     }
 
-    public getTokenNames(pair: Pair) {
-        return pair.name.split('-')
-    }
+
 
     /**
      * Volume in dollars

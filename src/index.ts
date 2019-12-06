@@ -3,10 +3,12 @@ import Analyzer from './analyzer/Analyzer';
 import Logger from './logger/Logger'
 
 import { period, pairs } from './../app-config.json';
+import Pair from "./connector/Pair";
 
 const main = async function (): Promise<number> {
 
-    const connector = new Connector(pairs);
+    const pairsObjects = pairs.map(item=>(new Pair([item.tokens[0], item.tokens[1]], item.name, item.volume)))
+    const connector = new Connector(pairsObjects);
     const result = await connector.getAllRates();
 
     console.log(result);
