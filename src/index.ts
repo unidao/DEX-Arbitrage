@@ -1,6 +1,7 @@
 import Connector from './connector/Connector';
 import Analyzer from './analyzer/Analyzer';
 import Logger from './logger/Logger'
+const chalk = require('chalk');
 
 import { period, pairs } from './../app-config.json';
 import Pair from "./connector/Pair";
@@ -11,15 +12,18 @@ const main = async function (): Promise<number> {
     const connector = new Connector(pairsObjects);
     const result = await connector.getAllRates();
 
-    console.log(result);
-    if(result.Oasis){
-        for(let pairResult of result.Oasis){
-            if(pairResult.success){
-                console.log(pairResult)
-            }
+    // console.log(result);
+
+
+    for(let exchange of Object.keys(result)){
+        console.log(chalk.greenBright(exchange));
+        for(let pair of result[exchange]){
+            console.log("    "+chalk.yellow(pair.name))
+            console.log("        Buy rate: "+chalk.yellow(pair.buyRate))
+            console.log("        Sell rate: "+chalk.yellow(pair.sellRate))
+            console.log(chalk.redBright("        Volume: ")+chalk.yellow(`${pair.volume}$`))
         }
     }
-
     // const analyzer = new Analyzer();
     // const abilities = analyzer.analyzePairs(pairs);
 
