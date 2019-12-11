@@ -6,6 +6,7 @@ import EXCHANGE_ABI from "./../../ABI/uniswapExchangeAbi.json";
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
 import Converter from "./../Converter"
+const BN = require('bignumber.js');
 
 const provider: string = config.ethereumProvider;
 
@@ -53,8 +54,8 @@ export default class UniswapParser extends AbstractParser {
 
         // Get volumes from dollars
         try {
-            secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
             firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
+            secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
         } catch (e) {
 
             console.log(e.message);
@@ -81,7 +82,7 @@ export default class UniswapParser extends AbstractParser {
                 result = await this.getTknToEthRates(firstTokenExchange, firstTokenVolume);
             }
         } else {
-            result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume);
+            result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume, pair);
 
         }
 
@@ -96,7 +97,8 @@ export default class UniswapParser extends AbstractParser {
     private async getTknToTknRates(firstTokenExchange: string,
                                    secondTokenExchange: string,
                                    firstTokenVolume: number,
-                                   secondTokenVolume: number
+                                   secondTokenVolume: number,
+                                   pair: Pair
     ): Promise<{sellRate: number, buyRate: number}> {
 
 
@@ -105,37 +107,63 @@ export default class UniswapParser extends AbstractParser {
         // @ts-ignore
         const secondTokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, secondTokenExchange);
 
+        const ftvwei = (new BN(firstTokenVolume)).times(BN(Math.pow(10, pair.firstTokenDecimals)));
+        const pow = web3.utils.toBN(10).pow(web3.utils.toBN(pair.firstTokenDecimals))
+        const web3BN = web3.utils.toBN(firstTokenVolume.toFixed(0)).mul(pow)
+        // console.log(ftvwei)
+        // console.log(web3BN.toString())
+        // process.exit();
+        //parseInt((firstTokenVolume*(Math.pow(10, pair.firstTokenDecimals))).toString());
 
+        // const stvwei = parseInt((secondTokenVolume*(Math.pow(10, pair.secondTokenDecimals))).toString());
+        const secondPow = Math.pow(10, pair.secondTokenDecimals);
+        const stvwei = (new BN(secondTokenVolume)).times(BN(secondPow)).toFixed(0) //parseInt((secondTokenVolume*(Math.pow(10, pair.secondTokenDecimals))).toString());
+        // const secondWeb3BN = web3.utils.toBN(stvwei);
 
-        const ftvwei = parseInt((firstTokenVolume*UI256).toString());
-        const stvwei = parseInt((secondTokenVolume*UI256).toString());
-
+        // console.log(firstTokenVolume)
+        // console.log(ftvwei)
+        // console.log(secondTokenVolume)
+        // // console.log(stvwei)
+        // console.log(ftvwei.toFixed(0).toString())
+        // console.log(parseInt(ftvwei.toFixed().toString()));
+        // console.log(stvwei.toFixed(0).toString())
+        // console.log(parseInt(stvwei.toFixed().toString()))
+        // process.exit()
         // купить токен можно по этой стоимость (эфир за токен)
-        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(ftvwei).call();
+        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(web3BN.toString()).call();
 
         // продать токен за эфир можно по этой стоимость (эфир за токен)
-        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(ftvwei).call();
-
+        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(web3BN.toString()).call();
 
         const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(stvwei).call();
         const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(stvwei).call();
 
-        // console.log("volumes")
-        // console.log("firstTokenVolume: ", firstTokenVolume)
-        // console.log("secondTokenVolume: ", secondTokenVolume)
-        //
-        // console.log('-------------')
-        // console.log("outputPriceTkn1: ", outputPriceTkn1)
-        // console.log("outputPriceTkn2: ", outputPriceTkn2)
-        // console.log("inputPriceTkn1: ", inputPriceTkn1)
-        // console.log("inputPriceTkn2: ", inputPriceTkn2)
 
-        const buyPriceInEthToken1 = outputPriceTkn1 / ftvwei;
-        const buyPriceInEthToken2 = outputPriceTkn2 / stvwei;
+
+        console.log(pair.name)
+        console.log("firstTokenVolume: ", firstTokenVolume)
+        console.log("secondTokenVolume: ", secondTokenVolume)
+
+        console.log('-------------')
+        console.log("outputPriceTkn1: ", outputPriceTkn1)
+        console.log("outputPriceTkn2: ", outputPriceTkn2)
+        console.log("inputPriceTkn1: ", inputPriceTkn1)
+        console.log("inputPriceTkn2: ", inputPriceTkn2)
+        console.log('-------------')
+        console.log('firstTokenVolume ', firstTokenVolume)
+        console.log('secondTokenVolume ', secondTokenVolume)
+        console.log('-------------')
+        console.log('ftvwei ', ftvwei)
+        console.log('stvwei ', stvwei)
+
+
+
+        const buyPriceInEthToken1 = outputPriceTkn1 / firstTokenVolume;
+        const buyPriceInEthToken2 = outputPriceTkn2 / secondTokenVolume;
         const buyPrice = buyPriceInEthToken1 / buyPriceInEthToken2;
 
-        const sellPriceInEthToken1 = inputPriceTkn1 / ftvwei;
-        const sellPriceInEthToken2 = inputPriceTkn2 / stvwei;
+        const sellPriceInEthToken1 = inputPriceTkn1 / firstTokenVolume;
+        const sellPriceInEthToken2 = inputPriceTkn2 / secondTokenVolume;
         const sellPrice = sellPriceInEthToken1 / sellPriceInEthToken2;
 
 

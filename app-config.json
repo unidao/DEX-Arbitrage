@@ -1,46 +1,76 @@
 {
   "pairs": [
     {
+      "name": "usd-coin/dai",
+      "tokens": [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "decimals": [
+        6,
+        18
+      ],
+      "volume": 1000
+    },
+    {
+      "name": "dai/usd-coin",
+      "tokens": [
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      ],
+      "decimals": [
+        18,
+        6
+      ],
+      "volume": 1000
+    },
+    {
       "name": "ethereum/dai",
       "tokens": [
-        "ethereum", "0x6b175474e89094c44da98b954eedeac495271d0f"
+        "ethereum",
+        "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "decimals": [
+        18,
+        18
       ],
       "volume": 1000
     },
     {
       "name": "dai/ethereum",
       "tokens": [
-        "0x6b175474e89094c44da98b954eedeac495271d0f", "ethereum"
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "ethereum"
+      ],
+      "decimals": [
+        18,
+        18
       ],
       "volume": 1000
     },
     {
       "name": "0x/dai",
       "tokens": [
-        "0xe41d2489571d322189246dafa5ebde1f4699f498", "0x6b175474e89094c44da98b954eedeac495271d0f"
+        "0xe41d2489571d322189246dafa5ebde1f4699f498",
+        "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "decimals": [
+        18,
+        18
       ],
       "volume": 1000
     },
     {
       "name": "maker/dai",
       "tokens": [
-        "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2", "0x6b175474e89094c44da98b954eedeac495271d0f"
+        "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+        "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 1000
-    },
-    {
-    "name": "dai/usd-coin",
-    "tokens": [
-      "0x6b175474e89094c44da98b954eedeac495271d0f", "0x39aa39c021dfbae8fac545936693ac917d5e7563"
-    ],
-    "volume": 1000
-    },
-    {
-      "name": "basic-attention-token/dai",
-      "tokens": [
-        "0x0d8775f648430679a709e98d2b0cb6250d2887ef", "0x6b175474e89094c44da98b954eedeac495271d0f"
-      ],
-      "volume": 1000
+      "volume": 1000,
+      "decimals": [
+        18,
+        18
+      ]
     }
   ],
   "period": 120,
@@ -49,7 +79,7 @@
     "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95"
   },
   "ethereumProvider": "https://mainnet.infura.io/v3/017f815a252547ffbe03eefa154f5519",
-  "coinGecko":{
+  "coinGecko": {
     "listUrl": "https://api.coingecko.com/api/v3/coins/list",
     "rateUrl": "https://api.coingecko.com/api/v3/simple/price"
   }

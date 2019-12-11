@@ -11,9 +11,20 @@ class Pair{
     private _rateDate?: number
     private _ethereumReplacement?: string;
 
-    constructor(private _tokens: [string, string], private _name: string, private _volume: number  ){
+    constructor(private _tokens: [string, string], private _decimals: [number, number], private _name: string, private _volume: number  ){
 
     }
+
+
+    get firstTokenDecimals(){
+        return this._decimals[0];
+    }
+
+    get secondTokenDecimals(){
+        return this._decimals[1];
+    }
+
+
 
     /**
      * Если на бирже используется заменя для ethereum, возвращать этот токен вместо эфира

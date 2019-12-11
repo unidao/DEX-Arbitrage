@@ -5,7 +5,7 @@ import {ABI} from "./../../ABI/oasisAbi.json";
 // import config from "app-config.json"
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
-
+const BigNumber = require('bignumber.js');
 
 const provider: string = config.ethereumProvider;
 
@@ -77,23 +77,21 @@ export default class OasisParser extends AbstractParser {
             firstToken = pairClone.secondToken;
             secondToken = pairClone.firstToken;
         }
-        const requiredVolume = await this.getVolumeForToken(pairClone.getTokenNames()[0], pairClone.volume);
+        let requiredVolume = new BigNumber(await this.getVolumeForToken(pairClone.getTokenNames()[0], pairClone.volume));
+        // requiredVolume = parseFloat(requiredVolume.toFixed(16));
 
-        // console.log('------')
-        // console.log(firstToken)
-        // console.log(secondToken)
-        // const requiredVolume = pair.volume;
 
-        let currentVolume = 0;
-        let secondVolume = 0;
+        let currentVolume = new BigNumber(0);
+        let secondVolume = new BigNumber(0);
 
         let lastOrderId: number = 0;
         try {
-            while (requiredVolume >= currentVolume) {
-                console.log("currentVolume: ", currentVolume)
+            while (requiredVolume.gte(currentVolume)) {
+
                 const lastOrderMemory: number = lastOrderId
-                if (currentVolume === 0) {
+                if (currentVolume.eq(new BigNumber(0))) {
                     lastOrderId = await oasisContract.methods.getBestOffer(firstToken, secondToken).call();
+                    console.log("lastOrderId :", lastOrderId)
                     if(lastOrderId==0){
                         let msg = `нет офферов для DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
                         console.log(msg)
@@ -120,23 +118,16 @@ export default class OasisParser extends AbstractParser {
 
 
                 const order: any = await oasisContract.methods.getOffer(lastOrderId).call();
-                const amount = Web3.utils.fromWei(order['0']);
-                currentVolume += parseFloat(amount);
-                secondVolume +=  parseFloat(Web3.utils.fromWei(order['2']));
+                // console.log(order)
+
+                // web3.utils.
+                currentVolume = currentVolume.plus((BigNumber(order['0'])))
+                secondVolume = secondVolume.plus((new BigNumber(order['2'])))
+
             }
 
 
-            /*
-            console.log("Orders: ", orders.map(order=>{
 
-                return {
-                    REP: order[1],
-                    REP_VOLUME: Web3.utils.fromWei(order['0']),
-                    DAI: order[3],
-                    DAI_VOLUME:Web3.utils.fromWei(order['2'])
-                }
-            }));
-            */
 
         } catch (e) {
             let msg = `Error while downloading offers for DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
@@ -148,10 +139,13 @@ export default class OasisParser extends AbstractParser {
             }
         }
 
+        let decCurrVol = reverse ? currentVolume.div(Math.pow(10, pair.secondTokenDecimals)) : currentVolume.div(Math.pow(10, pair.firstTokenDecimals))
+        let secDecVol = reverse ? secondVolume.div(Math.pow(10, pair.firstTokenDecimals)) : secondVolume.div(Math.pow(10, pair.secondTokenDecimals));
 
+        let finalRate = reverse ? decCurrVol.dividedBy(secDecVol) : secDecVol.dividedBy( decCurrVol);
         return {
             success: true,
-            rate: reverse ? currentVolume / secondVolume : secondVolume / currentVolume
+            rate: parseFloat(finalRate.toString())
         }
     }
 

@@ -13,8 +13,10 @@
   "author": "Konstantin L.",
   "license": "ISC",
   "dependencies": {
+    "@types/mathjs": "^6.0.2",
     "@types/node": "^12.12.14",
     "axios": "^0.19.0",
+    "bignumber.js": "^9.0.0",
     "chalk": "^3.0.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.7.2",

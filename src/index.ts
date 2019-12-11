@@ -8,7 +8,10 @@ import Pair from "./connector/Pair";
 
 const main = async function (): Promise<number> {
 
-    const pairsObjects = pairs.map(item=>(new Pair([item.tokens[0], item.tokens[1]], item.name, item.volume)))
+    const pairsObjects = pairs.map(item=>(new Pair(
+        [item.tokens[0], item.tokens[1]],
+        [item.decimals[0], item.decimals[1]],
+        item.name, item.volume)))
     const connector = new Connector(pairsObjects);
     const result = await connector.getAllRates();
 
@@ -19,8 +22,8 @@ const main = async function (): Promise<number> {
         console.log(chalk.greenBright(exchange));
         for(let pair of result[exchange]){
             console.log("    "+chalk.yellow(pair.name))
-            console.log("        Buy rate: "+chalk.yellow(pair.buyRate))
-            console.log("        Sell rate: "+chalk.yellow(pair.sellRate))
+            console.log("        Buy rate: "+chalk.greenBright(pair.buyRate))
+            console.log("        Sell rate: "+chalk.greenBright(pair.sellRate))
             console.log(chalk.redBright("        Volume: ")+chalk.yellow(`${pair.volume}$`))
         }
     }
