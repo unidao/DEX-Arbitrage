@@ -13,8 +13,8 @@ export default class Connector {
         const cleanPairs = this.getPairs();
         const oasisParser = new OasisParser(cleanPairs);
         const uniswapParser = new UniswapParser(cleanPairs);
-        // this.parsers = [uniswapParser]
-        this.parsers = [oasisParser, uniswapParser]
+        this.parsers = [uniswapParser]
+        // this.parsers = [oasisParser, uniswapParser]
         // this.parsers = [oasisParser]
     }
 

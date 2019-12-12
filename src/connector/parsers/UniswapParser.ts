@@ -12,6 +12,8 @@ const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
 import { ETHEREUM } from '../Connector';
+const chalk = require('chalk');
+
 const UI256 = 100000000;
 
 
@@ -107,54 +109,44 @@ export default class UniswapParser extends AbstractParser {
         // @ts-ignore
         const secondTokenExchangeContract = new web3.eth.Contract(EXCHANGE_ABI, secondTokenExchange);
 
-        const ftvwei = (new BN(firstTokenVolume)).times(BN(Math.pow(10, pair.firstTokenDecimals)));
-        const pow = web3.utils.toBN(10).pow(web3.utils.toBN(pair.firstTokenDecimals))
-        const web3BN = web3.utils.toBN(firstTokenVolume.toFixed(0)).mul(pow)
-        // console.log(ftvwei)
-        // console.log(web3BN.toString())
-        // process.exit();
-        //parseInt((firstTokenVolume*(Math.pow(10, pair.firstTokenDecimals))).toString());
 
-        // const stvwei = parseInt((secondTokenVolume*(Math.pow(10, pair.secondTokenDecimals))).toString());
-        const secondPow = Math.pow(10, pair.secondTokenDecimals);
-        const stvwei = (new BN(secondTokenVolume)).times(BN(secondPow)).toFixed(0) //parseInt((secondTokenVolume*(Math.pow(10, pair.secondTokenDecimals))).toString());
-        // const secondWeb3BN = web3.utils.toBN(stvwei);
 
-        // console.log(firstTokenVolume)
-        // console.log(ftvwei)
-        // console.log(secondTokenVolume)
-        // // console.log(stvwei)
-        // console.log(ftvwei.toFixed(0).toString())
-        // console.log(parseInt(ftvwei.toFixed().toString()));
-        // console.log(stvwei.toFixed(0).toString())
-        // console.log(parseInt(stvwei.toFixed().toString()))
-        // process.exit()
+
+        // const ftvwei = (new BN(firstTokenVolume)).times(BN(Math.pow(10, pair.firstTokenDecimals)));
+        // const pow = web3.utils.toBN(10).pow(web3.utils.toBN(pair.firstTokenDecimals))
+        // const web3BN = web3.utils.toBN(BN(firstTokenVolume)).mul(pow)
+
+
+
+        let firstTokenVolumeInteger = BN(firstTokenVolume.toString()).times(Math.pow(10, pair.firstTokenDecimals));
+        let firstTokenVolumeIntegerWeb3 = web3.utils.toBN(firstTokenVolumeInteger);
+
+
+
+        let secondTokenVolumeInteger = BN(secondTokenVolume.toString()).times(Math.pow(10, pair.secondTokenDecimals));
+        let secondTokenVolumeIntegerWeb3 = web3.utils.toBN(secondTokenVolumeInteger);
+
+
+
+        // const secondPow = Math.pow(10, pair.secondTokenDecimals);
+        // const stvwei = (new BN(secondTokenVolume)).times(BN(secondPow)).toFixed(0) //parseInt((secondTokenVolume*(Math.pow(10, pair.secondTokenDecimals))).toString());
+
+        console.log('111')
+        console.log(firstTokenVolumeIntegerWeb3.toString())
         // купить токен можно по этой стоимость (эфир за токен)
-        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(web3BN.toString()).call();
+        const outputPriceTkn1 = await firstTokenExchangeContract.methods.getEthToTokenOutputPrice(firstTokenVolumeIntegerWeb3.toString()).call();
+
+        console.log('2222')
 
         // продать токен за эфир можно по этой стоимость (эфир за токен)
-        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(web3BN.toString()).call();
+        const inputPriceTkn1 = await firstTokenExchangeContract.methods.getTokenToEthInputPrice(firstTokenVolumeIntegerWeb3.toString()).call();
 
-        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(stvwei).call();
-        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(stvwei).call();
+        console.log('3333')
+        console.log(secondTokenVolumeIntegerWeb3.toString())
+        const outputPriceTkn2 = await secondTokenExchangeContract.methods.getEthToTokenOutputPrice(secondTokenVolumeIntegerWeb3.toString()).call();
+        console.log('4444')
+        const inputPriceTkn2 = await secondTokenExchangeContract.methods.getTokenToEthInputPrice(secondTokenVolumeIntegerWeb3.toString()).call();
 
-
-
-        console.log(pair.name)
-        console.log("firstTokenVolume: ", firstTokenVolume)
-        console.log("secondTokenVolume: ", secondTokenVolume)
-
-        console.log('-------------')
-        console.log("outputPriceTkn1: ", outputPriceTkn1)
-        console.log("outputPriceTkn2: ", outputPriceTkn2)
-        console.log("inputPriceTkn1: ", inputPriceTkn1)
-        console.log("inputPriceTkn2: ", inputPriceTkn2)
-        console.log('-------------')
-        console.log('firstTokenVolume ', firstTokenVolume)
-        console.log('secondTokenVolume ', secondTokenVolume)
-        console.log('-------------')
-        console.log('ftvwei ', ftvwei)
-        console.log('stvwei ', stvwei)
 
 
 
@@ -165,6 +157,20 @@ export default class UniswapParser extends AbstractParser {
         const sellPriceInEthToken1 = inputPriceTkn1 / firstTokenVolume;
         const sellPriceInEthToken2 = inputPriceTkn2 / secondTokenVolume;
         const sellPrice = sellPriceInEthToken1 / sellPriceInEthToken2;
+
+        console.log(chalk.yellowBright(`Подробная инфформация по: ${pair.name} | ${this.dexName}`));
+        console.log(firstTokenVolume.toString())
+        // console.log(web3BN.toString())
+        console.log(chalk.magentaBright(`Адрес обменника токена ${pair.getTokenNames()[0]} ${firstTokenExchange}`))
+        console.log(chalk.greenBright(`   Цена в эфире на вывод  токена ${pair.getTokenNames()[0]} для объема ${firstTokenVolume}:  ${outputPriceTkn1} (${outputPriceTkn1/Math.pow(10, 18)})`));
+        console.log(chalk.greenBright(`   Цена в эфире на ввод  токена ${pair.getTokenNames()[0]} для объема ${firstTokenVolume}:  ${inputPriceTkn1} (${inputPriceTkn1/Math.pow(10, 18)})`));
+        console.log(chalk.greenBright(`   Цена в эфире на вывод  токена ${pair.getTokenNames()[1]} для объема ${secondTokenVolume}:  ${outputPriceTkn2} (${outputPriceTkn2/Math.pow(10, 18)})`));
+        console.log(chalk.greenBright(`   Цена в эфире на ввод  токена ${pair.getTokenNames()[1]} для объема ${secondTokenVolume}:  ${inputPriceTkn2} (${inputPriceTkn2/Math.pow(10, 18)})`));
+        console.log(chalk.yellow('  --------------->>>'));
+        console.log(chalk.greenBright(`   Курс в эфире на вывод токена  ${pair.getTokenNames()[0]}: ${buyPriceInEthToken1/Math.pow(10, 18)}`));
+        console.log(chalk.greenBright(`   Курс в эфире на вывод токена  ${pair.getTokenNames()[1]}: ${buyPriceInEthToken2/Math.pow(10, 18)}`));
+        console.log(chalk.greenBright(`   Курс в эфире на ввод токена  ${pair.getTokenNames()[0]}: ${sellPriceInEthToken1/Math.pow(10, 18)}`));
+        console.log(chalk.greenBright(`   Курс в эфире на ввод токена  ${pair.getTokenNames()[1]}: ${sellPriceInEthToken2/Math.pow(10, 18)}`));
 
 
 
