@@ -121,8 +121,8 @@ export default class OasisParser extends AbstractParser {
                 // console.log(order)
 
                 // web3.utils.
-                currentVolume = currentVolume.plus((BigNumber(order['0'])))
-                secondVolume = secondVolume.plus((new BigNumber(order['2'])))
+                currentVolume = currentVolume.plus((BigNumber(order['0'].toString())))
+                secondVolume = secondVolume.plus((new BigNumber(order['2'].toString())))
 
             }
 
@@ -145,7 +145,7 @@ export default class OasisParser extends AbstractParser {
         let finalRate = reverse ? decCurrVol.dividedBy(secDecVol) : secDecVol.dividedBy( decCurrVol);
         return {
             success: true,
-            rate: parseFloat(finalRate.toString())
+            rate: BigNumber(finalRate.toString())
         }
     }
 

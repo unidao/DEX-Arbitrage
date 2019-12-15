@@ -1,4 +1,5 @@
-type Optional = number | undefined;
+type Optional = BigNumber | undefined;
+import BigNumber from "bignumber.js";
 
 import { ETHEREUM } from './Connector';
 const PAIR_SEPARATOR = '/';
@@ -6,9 +7,9 @@ const PAIR_SEPARATOR = '/';
 class Pair{
 
 
-    private _buyRate?: number
-    private _sellRate?: number
-    private _rateDate?: number
+    private _buyRate?: Optional
+    private _sellRate?: Optional
+    private _rateDate?: Optional
     private _ethereumReplacement?: string;
 
     constructor(private _tokens: [string, string], private _decimals: [number, number], private _name: string, private _volume: number  ){
