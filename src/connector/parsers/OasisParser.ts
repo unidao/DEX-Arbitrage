@@ -18,7 +18,6 @@ export default class OasisParser extends AbstractParser {
     contractAddr = OasisAddr;
 
     async getRates(): Promise<Pair[]> {
-
         let res: Pair[] = [];
         for (let pair of this.pairs) {
             try{
@@ -31,17 +30,13 @@ export default class OasisParser extends AbstractParser {
 
         }
 
-
         return res;
     }
 
     private async getRateForPair(pair: Pair): Promise<Pair> {
-
-
         try {
             // @ts-ignore
             const oasisContract = new web3.eth.Contract(ABI, this.contractAddr);
-
 
             let res1: RatesResult = await this.getRate(oasisContract, pair);
             console.log(res1)
@@ -118,9 +113,6 @@ export default class OasisParser extends AbstractParser {
 
 
                 const order: any = await oasisContract.methods.getOffer(lastOrderId).call();
-                // console.log(order)
-
-                // web3.utils.
                 currentVolume = currentVolume.plus((BigNumber(order['0'].toString())))
                 secondVolume = secondVolume.plus((new BigNumber(order['2'].toString())))
 

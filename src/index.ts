@@ -22,8 +22,8 @@ const main = async function (): Promise<number> {
         console.log(chalk.greenBright(exchange));
         for(let pair of result[exchange]){
             console.log("    "+chalk.yellow(pair.name))
-            console.log("        Buy rate: "+chalk.greenBright(pair.buyRate))
-            console.log("        Sell rate: "+chalk.greenBright(pair.sellRate))
+            console.log("        Buy rate: "+chalk.greenBright(pair.buyRate ? pair.buyRate.toFixed(8) : pair.buyRate))
+            console.log("        Sell rate: "+chalk.greenBright(pair.sellRate ? pair.sellRate.toFixed(8) : pair.sellRate))
             console.log(chalk.redBright("        Volume: ")+chalk.yellow(`${pair.volume}$`))
         }
     }

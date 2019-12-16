@@ -16,7 +16,7 @@ import BigNumber from "bignumber.js";
 // import BN = require("bn.js");
 const chalk = require('chalk');
 
-const UI256 = 100000000;
+const UI256 = 1000000000000000000;
 const ETH_DECIMALS = 18;
 
 
@@ -84,7 +84,7 @@ export default class UniswapParser extends AbstractParser {
             if(firstToken === ETHEREUM){
                 result = await this.getEthToTokenRates(secondTokenExchange, firstTokenVolume);
             }else{
-                result = await this.getTknToEthRates(firstTokenExchange, firstTokenVolume);
+                result = await this.getTknToEthRates(firstTokenExchange, firstTokenVolume, pair.firstTokenDecimals);
             }
         } else {
             result = await this.getTknToTknRates(firstTokenExchange, secondTokenExchange, firstTokenVolume, secondTokenVolume, pair);
@@ -145,7 +145,7 @@ export default class UniswapParser extends AbstractParser {
         console.log(`Res4: ${inputPriceTkn2.toString()}`)
 
 
-        let buyPrice = BN(outputPriceTkn2).dividedBy(firstTokenVolumeIntegerWeb3).dividedBy(Math.pow(10, ETH_DECIMALS - pair.firstTokenDecimals));
+        let buyPrice = BN(outputPriceTkn2).dividedBy(firstTokenVolumeIntegerWeb3).dividedBy(Math.pow(10,  pair.secondTokenDecimals - pair.firstTokenDecimals));
 
         console.log(pair.firstTokenDecimals - pair.secondTokenDecimals)
         console.log(pair.secondTokenDecimals - pair.firstTokenDecimals)
@@ -173,16 +173,20 @@ export default class UniswapParser extends AbstractParser {
 
 
 
-        const tvwei = parseInt((BN(ethVolume)*UI256).toString());
+        // const tvwei = (BN(ethVolume)*UI256).toString());
+
+        let ethVolumeInteger = BN(ethVolume.toFixed(ETH_DECIMALS)).times(Math.pow(10, ETH_DECIMALS));
+        let ethVolumeIntegerWeb3 = web3.utils.toBN(ethVolumeInteger);
+
 
         // купить токен можно по этой стоимость (эфир за токен)
-        const outputPriceTkn = await tokenExchangeContract.methods.getTokenToEthOutputPrice(tvwei).call();
+        const outputPriceTkn = await tokenExchangeContract.methods.getTokenToEthOutputPrice(ethVolumeIntegerWeb3.toString()).call();
 
         // продать токен за эфир можно по этой стоимость (эфир за токен)
-        const inputPriceTkn = await tokenExchangeContract.methods.getEthToTokenInputPrice(tvwei).call();
+        const inputPriceTkn = await tokenExchangeContract.methods.getEthToTokenInputPrice(ethVolumeIntegerWeb3.toString()).call();
 
-        const buyPrice = outputPriceTkn / tvwei;
-        const sellPrice = inputPriceTkn / tvwei;
+        const buyPrice = BN(outputPriceTkn).div(ethVolumeIntegerWeb3);
+        const sellPrice = BN(inputPriceTkn).div(ethVolumeIntegerWeb3);
 
         return {
             sellRate: BN(sellPrice), buyRate: BN(buyPrice)
@@ -193,7 +197,7 @@ export default class UniswapParser extends AbstractParser {
 
 
     private async getTknToEthRates(tokenExchange: string,
-                                   tokenVolume: number,
+                                   tokenVolume: number, tokenDecimals: number
     ): Promise<{sellRate: BigNumber, buyRate: BigNumber}> {
 
 
@@ -204,14 +208,18 @@ export default class UniswapParser extends AbstractParser {
 
         const tvwei = parseInt((tokenVolume*UI256).toString());
 
+        let tknVolumeInteger = BN(tokenVolume.toFixed(ETH_DECIMALS)).times(Math.pow(10, ETH_DECIMALS));
+        let tknVolumeIntegerWeb3 = web3.utils.toBN(tknVolumeInteger);
+
+
         // купить токен можно по этой стоимость (эфир за токен)
-        const outputPriceTkn = await tokenExchangeContract.methods.getEthToTokenOutputPrice(tvwei).call();
+        const outputPriceTkn = await tokenExchangeContract.methods.getEthToTokenOutputPrice(tknVolumeIntegerWeb3.toString()).call();
 
         // продать токен за эфир можно по этой стоимость (эфир за токен)
-        const inputPriceTkn = await tokenExchangeContract.methods.getTokenToEthInputPrice(tvwei).call();
+        const inputPriceTkn = await tokenExchangeContract.methods.getTokenToEthInputPrice(tknVolumeIntegerWeb3.toString()).call();
 
-        const buyPrice = outputPriceTkn / tvwei;
-        const sellPrice = inputPriceTkn / tvwei;
+        const buyPrice = BN(outputPriceTkn).div(tknVolumeIntegerWeb3);
+        const sellPrice = BN(inputPriceTkn).div(tknVolumeIntegerWeb3);
 
         return {
             sellRate: BN(sellPrice), buyRate: BN(buyPrice)
