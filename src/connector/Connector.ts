@@ -1,6 +1,7 @@
 import AbstractParser from "./AbstractParser";
 import OasisParser from "./parsers/OasisParser";
 import UniswapParser from "./parsers/UniswapParser";
+import KyberParser from "./parsers/KyberParser";
 import Pair from "./Pair";
 import {PairsData} from '../analyzer/Analyzer'
 
@@ -14,9 +15,11 @@ export default class Connector {
         const cleanPairs = this.getPairs();
         const oasisParser = new OasisParser(cleanPairs);
         const uniswapParser = new UniswapParser(cleanPairs);
+        const kyberParser = new KyberParser(cleanPairs);
         // this.parsers = [uniswapParser]
-        this.parsers = [oasisParser, uniswapParser]
+        this.parsers = [oasisParser, uniswapParser, kyberParser]
         // this.parsers = [oasisParser]
+        // this.parsers = [kyberParser, uniswapParser]
     }
 
 
