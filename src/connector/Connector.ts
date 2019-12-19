@@ -2,6 +2,7 @@ import AbstractParser from "./AbstractParser";
 import OasisParser from "./parsers/OasisParser";
 import UniswapParser from "./parsers/UniswapParser";
 import Pair from "./Pair";
+import {PairsData} from '../analyzer/Analyzer'
 
 export const ETHEREUM = 'ethereum';
 
@@ -26,7 +27,7 @@ export default class Connector {
     }
 
     public async getAllRates() {
-        let result: any = {};
+        let result: PairsData = {};
 
         const parsers = this.parsers;
         for (let parser of parsers) {

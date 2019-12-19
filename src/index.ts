@@ -5,6 +5,9 @@ const chalk = require('chalk');
 
 import { period, pairs } from './../app-config.json';
 import Pair from "./connector/Pair";
+import * as fs from "fs";
+// import BN = require("bn.js");
+import BigNumber from "bignumber.js";
 
 const main = async function (): Promise<number> {
 
@@ -16,7 +19,7 @@ const main = async function (): Promise<number> {
     const result = await connector.getAllRates();
 
     // console.log(result);
-
+    // fs.writeFileSync('./data.json', JSON.stringify(result, null, 2) , 'utf-8');
 
     for(let exchange of Object.keys(result)){
         console.log(chalk.greenBright(exchange));
@@ -27,8 +30,15 @@ const main = async function (): Promise<number> {
             console.log(chalk.redBright("        Volume: ")+chalk.yellow(`${pair.volume}$`))
         }
     }
-    // const analyzer = new Analyzer();
-    // const abilities = analyzer.analyzePairs(pairs);
+
+    for(let pair of result.Oasis){
+        if(pair.name === '0x/dai'){
+            pair.buyRate = new BigNumber(0.1)
+        }
+    }
+
+    const analyzer = new Analyzer(result);
+    const abilities = analyzer.analyzePairs();
 
     // const logger = new Logger();
     // logger.log(abilities);
