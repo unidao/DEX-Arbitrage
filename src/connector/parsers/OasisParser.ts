@@ -86,7 +86,7 @@ export default class OasisParser extends AbstractParser {
                 const lastOrderMemory: number = lastOrderId
                 if (currentVolume.eq(new BigNumber(0))) {
                     lastOrderId = await oasisContract.methods.getBestOffer(firstToken, secondToken).call();
-                    console.log("lastOrderId :", lastOrderId)
+                    // console.log("lastOrderId :", lastOrderId)
                     if(lastOrderId==0){
                         let msg = `нет офферов для DEX: ${this.dexName}. PAIR: ${pairClone.name}`;
                         console.log(msg)

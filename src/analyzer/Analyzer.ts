@@ -27,8 +27,10 @@ export default class Analyzer {
             for (let pair of pairs) {
                 const sellRate = pair.sellRate;
                 if (sellRate) {
-                    this.searchLowerBuyRate(sellRate, pair.name, exchange);
-                    // if not empty arr, write result to file
+                    let results = this.searchLowerBuyRate(sellRate, pair.name, exchange);
+                    if(results.length > 0){
+                        // TODO: write results to file
+                    }
                 }
             }
         }
@@ -36,23 +38,29 @@ export default class Analyzer {
 
     private searchLowerBuyRate(price: BigNumber, pairName: string, srcExchange: string) {
         const exchanges = this.exchanges.filter(e => e != srcExchange);
-        console.log(`SrcExchange: ${srcExchange}`)
-        console.log(`pairName: ${pairName}`)
-        console.log('exhcages to search: ', exchanges)
 
-        let result: any[] = [];
+        let results: any[] = [];
         for (let exchange of exchanges) {
             const pairs = this.pairsData[exchange];
             for (let pair of pairs) {
                 if (pair.name === pairName) {
                     const buyRate = pair.buyRate;
                     if (buyRate && price.isGreaterThan(buyRate)) {
+                        let res = {
+                            name: pair.name,
+                            buyOn: exchange,
+                            sellOn: srcExchange,
+                            buyRate: buyRate,
+                            sellRate: price
+                        };
                         console.log(chalk.red(`Pair: ${pair.name} has ability, source exchange: ${srcExchange}, dstExchange: ${exchange}`))
                         console.log(chalk.redBright(`We can buy ${buyRate.toFixed(8)} and sell by ${price.toFixed(8)}`))
-                        // if not empty arr, write result to file
+
+                        results.push(res);
                     }
                 }
             }
         }
+        return results;
     }
 }
