@@ -19,7 +19,7 @@ export default class Connector {
         // this.parsers = [uniswapParser]
         this.parsers = [oasisParser, uniswapParser, kyberParser]
         // this.parsers = [oasisParser]
-        // this.parsers = [kyberParser, uniswapParser]
+        // this.parsers = [kyberParser]
     }
 
 

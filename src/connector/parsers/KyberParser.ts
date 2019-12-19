@@ -10,7 +10,7 @@ const BigNumber = require('bignumber.js');
 const provider: string = config.ethereumProvider;
 
 const web3 = new Web3(provider);
-// const WETH_ADDR = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
+const ETHEREUM_REPLACEMENT = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 const KyberAddr = config.contractsAddrs.kyber;
 
@@ -18,6 +18,7 @@ export default class KyberParser extends AbstractParser {
     dexName = 'Kyber';
     contractAddr = KyberAddr;
     private dexContract: any;
+
 
 
     constructor(pairs: Pair[]) {
@@ -47,10 +48,11 @@ export default class KyberParser extends AbstractParser {
     private async getRateForPair(pair: Pair): Promise<Pair> {
 
         const pairClone: Pair = pair.getCopy();
+        pairClone.ethereumReplacement = ETHEREUM_REPLACEMENT;
 
         // Init
-        const [firstToken, secondToken] = pair.tokens;
-        const [firstTokenName, secondTokenName] = pair.getTokenNames();
+        const [firstToken, secondToken] = pairClone.tokens;
+        const [firstTokenName, secondTokenName] = pairClone.getTokenNames();
         const hasEthereum = firstToken === ETHEREUM || secondToken === ETHEREUM;
 
         let firstTokenVolume: number;
@@ -59,8 +61,8 @@ export default class KyberParser extends AbstractParser {
 
         // Get volumes from dollars
         try {
-            firstTokenVolume = await this.getVolumeForToken(firstTokenName, pair.volume)
-            secondTokenVolume = await this.getVolumeForToken(secondTokenName, pair.volume)
+            firstTokenVolume = await this.getVolumeForToken(firstTokenName, pairClone.volume)
+            secondTokenVolume = await this.getVolumeForToken(secondTokenName, pairClone.volume)
         } catch (e) {
 
             console.log(e.message);
@@ -72,21 +74,21 @@ export default class KyberParser extends AbstractParser {
         console.log("firstToken ", firstToken);
         console.log("secondToken ", secondToken);
 
-        let firstTokenVolumeInteger = BigNumber(firstTokenVolume.toFixed(pair.firstTokenDecimals)).times(Math.pow(10, pair.firstTokenDecimals));
+        let firstTokenVolumeInteger = BigNumber(firstTokenVolume.toFixed(pairClone.firstTokenDecimals)).times(Math.pow(10, pairClone.firstTokenDecimals));
         let firstTokenVolumeIntegerWeb3 = web3.utils.toBN(firstTokenVolumeInteger);
 
 
-        let secondTokenVolumeInteger = BigNumber(secondTokenVolume.toFixed(pair.secondTokenDecimals)).times(Math.pow(10, pair.secondTokenDecimals));
+        let secondTokenVolumeInteger = BigNumber(secondTokenVolume.toFixed(pairClone.secondTokenDecimals)).times(Math.pow(10, pairClone.secondTokenDecimals));
         let secondTokenVolumeIntegerWeb3 = web3.utils.toBN(secondTokenVolumeInteger);
 
 
         let sellRate: any;
         let buyRate: any;
 
-        if (hasEthereum) {
+        /*if (hasEthereum) {
             sellRate = undefined
             buyRate = undefined
-        } else {
+        } else {*/
             const buyResult: any = await this.dexContract.methods.getExpectedRate(secondToken, firstToken, secondTokenVolumeIntegerWeb3.toString()).call();
             const buyResultBN = BigNumber(buyResult.expectedRate);
             buyRate = BigNumber(1).div(buyResultBN.div(Math.pow(10, 18)))
@@ -96,7 +98,7 @@ export default class KyberParser extends AbstractParser {
             const sellResultBN = BigNumber(sellResult.expectedRate).div(Math.pow(10, 18));
             sellRate = sellResultBN;
             console.log("sellResult: ", sellResultBN.toFixed(6));
-        }
+        // }
 
 
 

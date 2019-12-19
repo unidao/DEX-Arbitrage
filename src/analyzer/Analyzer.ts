@@ -30,6 +30,7 @@ export default class Analyzer {
                     let results = this.searchLowerBuyRate(sellRate, pair.name, exchange);
                     if(results.length > 0){
                         // TODO: write results to file
+                        console.log(results)
                     }
                 }
             }
@@ -50,8 +51,8 @@ export default class Analyzer {
                             name: pair.name,
                             buyOn: exchange,
                             sellOn: srcExchange,
-                            buyRate: buyRate,
-                            sellRate: price
+                            buyRate: buyRate.toFixed(6),
+                            sellRate: price.toFixed(6)
                         };
                         console.log(chalk.red(`Pair: ${pair.name} has ability, source exchange: ${srcExchange}, dstExchange: ${exchange}`))
                         console.log(chalk.redBright(`We can buy ${buyRate.toFixed(8)} and sell by ${price.toFixed(8)}`))
