@@ -31,11 +31,11 @@ const main = async function (): Promise<number> {
         }
     }
 
-    for(let pair of result.Oasis){
-        if(pair.name === '0x/dai'){
-            pair.buyRate = new BigNumber(0.1)
-        }
-    }
+    // for(let pair of result.Oasis){
+    //     if(pair.name === '0x/dai'){
+    //         pair.buyRate = new BigNumber(0.1)
+    //     }
+    // }
 
     const analyzer = new Analyzer(result);
     const abilities = analyzer.analyzePairs();

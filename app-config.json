@@ -10,7 +10,43 @@
         6,
         18
       ],
-      "volume": 1000
+      "volume": 10000
+    },
+    {
+      "name": "augur/dai",
+      "tokens": [
+        "0x1985365e9f78359a9B6AD760e32412f4a445E862",
+        "0x6b175474e89094c44da98b954eedeac495271d0f"
+      ],
+      "decimals": [
+        18,
+        18
+      ],
+      "volume": 10000
+    },
+    {
+      "name": "augur/usd-coin",
+      "tokens": [
+        "0x1985365e9f78359a9B6AD760e32412f4a445E862",
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      ],
+      "decimals": [
+        18,
+        6
+      ],
+      "volume": 10000
+    },
+    {
+      "name": "augur/ethereum",
+      "tokens": [
+        "0x1985365e9f78359a9B6AD760e32412f4a445E862",
+        "ethereum"
+      ],
+      "decimals": [
+        18,
+        18
+      ],
+      "volume": 10000
     },
    {
       "name": "weth/dai",
@@ -22,7 +58,7 @@
         18,
         18
       ],
-      "volume": 1000
+      "volume": 10000
     },
     {
       "name": "dai/usd-coin",
@@ -34,7 +70,7 @@
         18,
         6
       ],
-      "volume": 1000
+      "volume": 10000
     },
     {
       "name": "ethereum/dai",
@@ -46,7 +82,7 @@
         18,
         18
       ],
-      "volume": 1000
+      "volume": 10000
     },
     {
       "name": "dai/ethereum",
@@ -58,7 +94,7 @@
         18,
         18
       ],
-      "volume": 1000
+      "volume": 10000
     },
     {
       "name": "0x/dai",
@@ -70,7 +106,7 @@
         18,
         18
       ],
-      "volume": 1000
+      "volume": 10000
     },
     {
       "name": "maker/dai",
@@ -78,7 +114,7 @@
         "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
         "0x6b175474e89094c44da98b954eedeac495271d0f"
       ],
-      "volume": 1000,
+      "volume": 10000,
       "decimals": [
         18,
         18

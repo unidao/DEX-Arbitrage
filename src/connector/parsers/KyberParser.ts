@@ -5,6 +5,7 @@ import ABI from "./../../ABI/kyberAbi.json";
 import config from "./../../../app-config.json";
 import RatesResult from "../RatesResult";
 import {ETHEREUM} from "../Connector";
+
 const BigNumber = require('bignumber.js');
 
 const provider: string = config.ethereumProvider;
@@ -20,7 +21,6 @@ export default class KyberParser extends AbstractParser {
     private dexContract: any;
 
 
-
     constructor(pairs: Pair[]) {
         super(pairs)
 
@@ -32,10 +32,10 @@ export default class KyberParser extends AbstractParser {
     async getRates(): Promise<Pair[]> {
         let res: Pair[] = [];
         for (let pair of this.pairs) {
-            try{
+            try {
                 const rate = await this.getRateForPair(pair);
                 res.push(rate)
-            }catch (e) {
+            } catch (e) {
                 console.log(`Error parsing ${pair} on ${this.dexName}`)
                 console.log(e.message)
             }
@@ -66,7 +66,7 @@ export default class KyberParser extends AbstractParser {
         } catch (e) {
 
             console.log(e.message);
-            return  pair;
+            return pair;
         }
 
         console.log("firstTokenVolume ", firstTokenVolume);
@@ -89,8 +89,10 @@ export default class KyberParser extends AbstractParser {
             sellRate = undefined
             buyRate = undefined
         } else {*/
-            const buyResult: any = await this.dexContract.methods.getExpectedRate(secondToken, firstToken, secondTokenVolumeIntegerWeb3.toString()).call();
+        const buyResult: any = await this.dexContract.methods.getExpectedRate(secondToken, firstToken, secondTokenVolumeIntegerWeb3.toString()).call();
+        if(buyResult.expectedRate === 0){
             const buyResultBN = BigNumber(buyResult.expectedRate);
+
             buyRate = BigNumber(1).div(buyResultBN.div(Math.pow(10, 18)))
             console.log("buyResultFinish ", BigNumber(buyRate).toFixed(6))
 
@@ -98,8 +100,13 @@ export default class KyberParser extends AbstractParser {
             const sellResultBN = BigNumber(sellResult.expectedRate).div(Math.pow(10, 18));
             sellRate = sellResultBN;
             console.log("sellResult: ", sellResultBN.toFixed(6));
-        // }
+        }else{
+            buyRate = undefined;
+            sellRate = undefined;
+        }
 
+
+        // }
 
 
         pairClone.buyRate = buyRate;
@@ -107,9 +114,6 @@ export default class KyberParser extends AbstractParser {
 
         return pairClone;
     }
-
-
-
 
 
 }

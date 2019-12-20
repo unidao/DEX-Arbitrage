@@ -17,7 +17,7 @@ export default class Connector {
         const uniswapParser = new UniswapParser(cleanPairs);
         const kyberParser = new KyberParser(cleanPairs);
         // this.parsers = [uniswapParser]
-        this.parsers = [oasisParser, uniswapParser, kyberParser]
+        this.parsers = [oasisParser, kyberParser, uniswapParser]
         // this.parsers = [oasisParser]
         // this.parsers = [kyberParser]
     }
