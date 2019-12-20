@@ -90,7 +90,7 @@ export default class KyberParser extends AbstractParser {
             buyRate = undefined
         } else {*/
         const buyResult: any = await this.dexContract.methods.getExpectedRate(secondToken, firstToken, secondTokenVolumeIntegerWeb3.toString()).call();
-        if(buyResult.expectedRate === 0){
+        if(buyResult.expectedRate !== 0){
             const buyResultBN = BigNumber(buyResult.expectedRate);
 
             buyRate = BigNumber(1).div(buyResultBN.div(Math.pow(10, 18)))

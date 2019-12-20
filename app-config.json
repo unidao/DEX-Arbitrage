@@ -121,7 +121,7 @@
       ]
     }
   ],
-  "sleepFor": 3000,
+  "sleepFor": 100,
   "contractsAddrs": {
     "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e",
     "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95",
