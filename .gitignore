@@ -1,3 +1,4 @@
 src/**/*.js
 .idea
 node_modules
+logs

@@ -7,6 +7,14 @@ const chalk = require('chalk');
 
 type Optional = BigNumber | undefined;
 
+export interface AnalyzerResult{
+    name: string,
+    buyOn: string,
+    sellOn: string,
+    buyRate: BigNumber,
+    sellRate: BigNumber
+}
+
 export interface PairsData {
     [key: string]: Pair[]
 }
@@ -20,7 +28,7 @@ export default class Analyzer {
     }
 
     public analyzePairs() {
-
+        let allResults: any[] = []
         for (let exchange of this.exchanges) {
             const pairs = this.pairsData[exchange];
 
@@ -31,10 +39,13 @@ export default class Analyzer {
                     if(results.length > 0){
                         // TODO: write results to file
                         console.log(results)
+                        allResults = [...allResults, ...results]
                     }
                 }
             }
         }
+
+        return allResults;
     }
 
     private searchLowerBuyRate(price: BigNumber, pairName: string, srcExchange: string) {
@@ -47,12 +58,12 @@ export default class Analyzer {
                 if (pair.name === pairName) {
                     const buyRate = pair.buyRate;
                     if (buyRate && price.isGreaterThan(buyRate)) {
-                        let res = {
+                        let res: AnalyzerResult = {
                             name: pair.name,
                             buyOn: exchange,
                             sellOn: srcExchange,
-                            buyRate: buyRate.toFixed(6),
-                            sellRate: price.toFixed(6)
+                            buyRate: buyRate,
+                            sellRate: price
                         };
                         console.log(chalk.red(`Pair: ${pair.name} has ability, source exchange: ${srcExchange}, dstExchange: ${exchange}`))
                         console.log(chalk.redBright(`We can buy ${buyRate.toFixed(8)} and sell by ${price.toFixed(8)}`))

@@ -48,7 +48,7 @@
       ],
       "volume": 10000
     },
-   {
+    {
       "name": "weth/dai",
       "tokens": [
         "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
@@ -121,7 +121,7 @@
       ]
     }
   ],
-  "period": 120,
+  "sleepFor": 3000,
   "contractsAddrs": {
     "oasis": "0x39755357759ce0d7f32dc8dc45414cca409ae24e",
     "uniswap": "0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95",
