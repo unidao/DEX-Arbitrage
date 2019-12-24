@@ -2,7 +2,7 @@ import AbstractParser from "../AbstractParser";
 import Pair from "../Pair";
 import Web3 from "web3";
 import ABI from "./../../ABI/kyberAbi.json";
-import config from "./../../../app-config.json";
+import config from "../../../config/app-config.json";
 import RatesResult from "../RatesResult";
 import {ETHEREUM} from "../Connector";
 

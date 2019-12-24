@@ -3,7 +3,7 @@ import Analyzer from './analyzer/Analyzer';
 
 const chalk = require('chalk');
 
-import {sleepFor, pairs} from './../app-config.json';
+import {sleepFor, pairs} from '../config/app-config.json';
 import Pair from "./connector/Pair";
 import Logger from './logger/Logger'
 import BigNumber from "bignumber.js";

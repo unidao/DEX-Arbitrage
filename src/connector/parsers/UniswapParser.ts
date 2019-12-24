@@ -3,7 +3,7 @@ import Pair from "../Pair";
 import Web3 from "web3";
 import ABI from "./../../ABI/uniswapAbi.json";
 import EXCHANGE_ABI from "./../../ABI/uniswapExchangeAbi.json";
-import config from "./../../../app-config.json";
+import config from "../../../config/app-config.json";
 import RatesResult from "../RatesResult";
 import Converter from "./../Converter"
 const BN = require('bignumber.js');

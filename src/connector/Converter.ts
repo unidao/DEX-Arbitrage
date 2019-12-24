@@ -1,4 +1,4 @@
-import {coinGecko} from './../../app-config.json';
+import {coinGecko} from '../../config/app-config.json';
 import axios from 'axios'
 
 const BASE_CURRENCY = 'usd';
